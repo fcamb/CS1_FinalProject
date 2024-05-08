@@ -17,18 +17,10 @@ int main(void)
 		std::cout << "GLFW: Setup failed. Exiting.\n";
 		return 0;
 	}
-	
-	/*v = { 100, 20, 80, 100, 70, 10, 30, 50, 60, 40, 
-		10, 30, 50, 110, 60, 40, 60, 70, 20, 10, 
-		50, 60, 80, 10, 40, 30, 50, 90, 100, 130, 
-		50, 20, 10, 30, 60, 70, 11, 80, 10, 20,
-		50, 20, 10, 30, 60, 70, 10, 80, 10, 20 };
-	v2 = v;
-	v_colors2.resize(v.size(), YELLOW);
-	v_colors.resize(v.size(), YELLOW);*/
-	fill_vectors(400);
-	//gl_gen_new_batch();
-	//gl_fill_batch(v.size());
+
+	fill_vectors(300);
+	gl_gen_new_batch();
+	gl_fill_batch(v.size());
 	
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -54,53 +46,38 @@ int main(void)
 				current_algo = SELECTION_SORT;
 			}
 		} 
-		
-		//std::cout << batch[0].position.x << "\n";
-		/*Vertex one = batch[0];
-		Vertex two = batch[1];
-		Vertex three = batch[2];
-		Vertex four = batch[3];
-		batch[0] = batch[4];
-		batch[1] = batch[5];
-		batch[2] = batch[6];
-		batch[3] = batch[7];
-		batch[4] = one;
-		batch[5] = two;
-		batch[6] = three;
-		batch[7] = four;
-		std::cout << batch[0].position.y << "\n";*/
 
 		switch (current_algo) {
 			case LINEAR_SEARCH:
 				gl_reset_batch();
-				std::cout << "LINEAR SEARCH.START.\n";
+				std::cout << "LINEAR SEARCH - START.\n";
 				linear_search(v.size(), linear_target);
 				current_algo = NONE;
-				std::cout << "LINEAR SEARCH.END.\n";
+				std::cout << "LINEAR SEARCH - END.\n";
 				break;
 			case BINARY_SEARCH:
-				std::cout << "BINARY SEARCH.START.\n";
+				std::cout << "BINARY SEARCH - START.\n";
 				binary_search(v.size(), bin_target);
 				current_algo = NONE;
-				std::cout << "BINARY SEARCH.END.\n";
+				std::cout << "BINARY SEARCH - END.\n";
 				break;
 			case BUBBLE_SORT:
 				gl_reset_batch();
-				std::cout << "BUBBLE SORT.START.\n";
+				std::cout << "BUBBLE SORT - START.\n";
 				bubble_sort(v.size());
 				current_algo = NONE;
-				std::cout << "BUBBLE SORT.END.\n";
+				std::cout << "BUBBLE SORT - END.\n";
 				break;
 			case SELECTION_SORT:
 				gl_reset_batch();
-				std::cout << "SELECTION SORT.START.\n";
+				std::cout << "SELECTION SORT - START.\n";
 				selection_sort(v.size());
 				current_algo = NONE;
-				std::cout << "SELECTION SORT.END.\n";
+				std::cout << "SELECTION SORT - END.\n";
 				break;
 			case NONE:
-				//gl_draw_batch();
-				gl_draw_rectangles();
+				gl_draw_batch();
+				//gl_draw_rectangles();
 		}
 		
 		glfwSwapBuffers(window);
@@ -176,8 +153,6 @@ void gl_fill_batch(int s)
 	float x = 0.0;
 	
 	batch_triangle_count = 0;
-	// ?
-	//batch.resize(s * 4);
 	
 	for (int i = 0; i < s; i++) {
 		rect_height = (float)v[i];
@@ -206,9 +181,8 @@ void gl_reset_batch()
 	std::cout << "RESETTING BATCH:\n";
 	v = v2;
 	v_colors = v_colors2;
-	//v_colors.resize(v.size(), YELLOW);
-	//batch.clear();
-	//gl_fill_batch(v.size());
+	batch.clear();
+	gl_fill_batch(v.size());
 }
 void gl_draw_rectangle(int num, int s, float x, Color color)
 {
@@ -255,6 +229,7 @@ void gl_draw_rectangles()
 		gl_draw_rectangle(v[i], n, (float)i, v_colors[i]);
 	}
 }
+
 bool glfw_setup()
 {
 	if (!glfwInit()) return false;
@@ -270,7 +245,7 @@ bool glfw_setup()
 	}
 	
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 	// callbacks
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -394,18 +369,19 @@ int binary_search(int s, int t)
 	v = v2;
 	v_colors = v_colors2;
 	std::sort(v.begin(), v.end());
-	//batch.clear();
-	//gl_fill_batch(v.size());
+	batch.clear();
+	gl_fill_batch(v.size());
+
 	int l = 0;
-	//int curr_l = l * 4;
+	int curr_l = l * 4;
 
 	int r = s - 1;
-	//int curr_r = r * 4;
+	int curr_r = r * 4;
 
 	int m = (l + r) / 2;
-	//int curr_m = m * 4;
+	int curr_m = m * 4;
 
-	float wait_timer = 0.5;
+	float wait_timer = 1.0;
 	float timer = 0.0;
 	float last_time = glfwGetTime();
 	
@@ -414,78 +390,43 @@ int binary_search(int s, int t)
 		if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
 			return -1;
 		}
+
 		timer += glfwGetTime() - last_time;
 		last_time = glfwGetTime();
 		
 		m = (l + r) / 2;
-		//curr_m = m * 4;
+		curr_m = m * 4;
 
 		if (v[m] == t) {
-			/*batch[curr_m].color = RED;
-			batch[curr_m + 1].color = RED;
-			batch[curr_m + 2].color = RED;
-			batch[curr_m + 3].color = RED;*/
-			v_colors[m] = RED;
+			set_batch_color(curr_r, YELLOW);
+			set_batch_color(curr_l, YELLOW);
+			set_batch_color(curr_m, RED);
 			glClear(GL_COLOR_BUFFER_BIT);
-			//gl_draw_batch();
-			gl_draw_rectangles();
+			gl_draw_batch();
 			return m;
 		}
 
-		v_colors[m] = GREEN;
-		v_colors[l] = BLACK;
-		v_colors[r] = BLACK;
-
-		/*batch[curr_m].color = GREEN;
-		batch[curr_m + 1].color = GREEN;
-		batch[curr_m + 2].color = GREEN;
-		batch[curr_m + 3].color = GREEN;
-
-		batch[curr_l].color = BLACK;
-		batch[curr_l + 1].color = BLACK;
-		batch[curr_l + 2].color = BLACK;
-		batch[curr_l + 3].color = BLACK;
-
-		batch[curr_r].color = BLACK;
-		batch[curr_r + 1].color = BLACK;
-		batch[curr_r + 2].color = BLACK;
-		batch[curr_r + 3].color = BLACK;*/
-
+		set_batch_color(curr_m, GREEN);
+		set_batch_color(curr_l, BLACK);
+		set_batch_color(curr_r, BLACK);
 
 		if (timer >= wait_timer) {
 			timer = 0.0;
-			v_colors[m] = YELLOW;
-			v_colors[l] = YELLOW;
-			v_colors[r] = YELLOW;
-			/*batch[curr_m].color = YELLOW;
-			batch[curr_m + 1].color = YELLOW;
-			batch[curr_m + 2].color = YELLOW;
-			batch[curr_m + 3].color = YELLOW;
-
-			batch[curr_l].color = YELLOW;
-			batch[curr_l + 1].color = YELLOW;
-			batch[curr_l + 2].color = YELLOW;
-			batch[curr_l + 3].color = YELLOW;
-
-			batch[curr_r].color = YELLOW;
-			batch[curr_r + 1].color = YELLOW;
-			batch[curr_r + 2].color = YELLOW;
-			batch[curr_r + 3].color = YELLOW;*/
-
 			if (v[m] > t) {
 				r = m - 1;
+				set_batch_color(curr_r, YELLOW);
 			}
 			else {
 				l = m + 1;
+				set_batch_color(curr_l, YELLOW);
 			}
-			
-			//curr_l = l * 4;
-			//curr_r = r * 4;
+
+			curr_l = l * 4;
+			curr_r = r * 4;
 		}
 		else {
 			glClear(GL_COLOR_BUFFER_BIT);
-			//gl_draw_batch();
-			gl_draw_rectangles();
+			gl_draw_batch();
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		}
@@ -493,200 +434,105 @@ int binary_search(int s, int t)
 	v = v2;
 	return -1;
 }
+void set_batch_color(int i, Color c)
+{
+	batch[i].color = c;
+	batch[i + 1].color = c;
+	batch[i + 2].color = c;
+	batch[i + 3].color = c;
+}
 
+void create_rectangle(int vi, int bi, int s, Color color)
+{
+	float rect_width = (screen_w / s) - 1.0;
+	float rect_height = (float)v[vi] * 2.0;
+	float start_y = screen_h - rect_height;
+	float x = (vi * (rect_width + 1.0));
+
+	float rx = (2.f * x / screen_w - 1.f);
+	float ry = -(2.f * start_y / screen_h - 1.f);
+	float rw = (2.f * (x + rect_width) / screen_w - 1.f);
+	float rh = -(2.f * (start_y + rect_height) / screen_h - 1.f);
+
+	batch[bi] = { {rx, ry}, color };
+	batch[bi + 1] = { {rx, rh}, color };
+	batch[bi + 2] = { {rw, rh}, color };
+	batch[bi + 3] = { {rw, ry}, color };
+}
 void bubble_sort(int s)
 {
 	int t = 0;
-	//int curr = 0;
-	//int curr_next = 4;
-	//int end = (s - 1) * 4;
-	
-	float wait_timer = 0.0001;
-	float timer = 0.0;
-	float last_time = glfwGetTime();
+	int curr = 0;
+	int next = 4;
+	int end = (s - 1) * 4;
 
 	for (int i = s - 1; i > 0; i--) {
-
-		//end = i * 4;
-		/*batch[end].color = BLACK;
-		batch[end + 1].color = BLACK;
-		batch[end + 2].color = BLACK;
-		batch[end + 3].color = BLACK;*/
-		v_colors[i] = BLACK;
-
+		end = i * 4;
+		set_batch_color(end, BLACK);
 		for (int j = 0; j < i; j++) {
-
 			if (glfwWindowShouldClose(window)) return;
 			if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
 				return;
 			}
-
-			v_colors[j] = GREEN;
-			v_colors[j + 1] = BLUE;
-
-
+			curr = j * 4;
+			next = (j + 1) * 4;
+			set_batch_color(curr, GREEN);
+			set_batch_color(next, BLUE);
 			if (v[j] > v[j + 1]) {
-
 				// swap
 				t = v[j];
 				v[j] = v[j + 1];
 				v[j + 1] = t;
+				set_batch_color(end, BLACK);
+				//batch_swap(curr, next);
+				create_rectangle(j, curr, v.size(), GREEN);
+				create_rectangle(j + 1, next, v.size(), BLUE);
 
-				v_colors[i] = BLACK;
-				//glClear(GL_COLOR_BUFFER_BIT);
-				////gl_draw_batch();
-				//gl_draw_rectangles();
-				//glfwSwapBuffers(window);
-				//glfwPollEvents();
-
-				// gotta find a better way than this
-				//batch.clear();
-				//gl_fill_batch(v.size());
-
-				//batch[end].color = BLACK;
-				//batch[end + 1].color = BLACK;
-				//batch[end + 2].color = BLACK;
-				//batch[end + 3].color = BLACK;
-
+				glClear(GL_COLOR_BUFFER_BIT);
+				gl_draw_batch();
+				glfwSwapBuffers(window);
+				glfwPollEvents();
 			}
-
-			//timer += glfwGetTime() - last_time;
-			//last_time = glfwGetTime();
-			
-			//curr = j * 4;
-			
-			/*batch[curr].color = GREEN;
-			batch[curr + 1].color = GREEN;
-			batch[curr + 2].color = GREEN;
-			batch[curr + 3].color = GREEN;*/
-
-			/*curr_next = (j + 1) * 4;
-
-			batch[curr_next].color = BLUE;
-			batch[curr_next + 1].color = BLUE;
-			batch[curr_next + 2].color = BLUE;
-			batch[curr_next + 3].color = BLUE;*/
-			
-
-			//if (timer >= wait_timer) {
-			//	
-			//	timer = 0.0;
-
-			//	if (v[j] > v[j + 1]) {
-			//		
-			//		// swap
-			//		t = v[j];
-			//		v[j] = v[j + 1];
-			//		v[j + 1] = t;
-			//		
-			//		v_colors[i] = BLACK;
-			//		// gotta find a better way than this
-			//		//batch.clear();
-			//		//gl_fill_batch(v.size());
-			//		
-			//		//batch[end].color = BLACK;
-			//		//batch[end + 1].color = BLACK;
-			//		//batch[end + 2].color = BLACK;
-			//		//batch[end + 3].color = BLACK;
-	
-			//	}
-			//}
-			//else {
-			//	j--;
-			//}
-			//glClear(GL_COLOR_BUFFER_BIT);
-			////gl_draw_batch();
-			//gl_draw_rectangles();
-			//glfwSwapBuffers(window);
-			//glfwPollEvents();
 		}
-		v_colors[i] = YELLOW;
-		/*batch[end].color = YELLOW;
-		batch[end + 1].color = YELLOW;
-		batch[end + 2].color = YELLOW;
-		batch[end + 3].color = YELLOW;*/
-
-		glClear(GL_COLOR_BUFFER_BIT);
-		//gl_draw_batch();
-		gl_draw_rectangles();
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		set_batch_color(end, YELLOW);
 	}
 }
 
 int linear_search(int s, int t)
 {
-	//int curr = 0;
-	float wait_timer = 0.005;
+	int curr = 0;
+	
+	float wait_timer = 0.001;
 	float timer = 0.0;
 	float last_time = glfwGetTime();
 	
 	for (int i = 0; i < s; i++) {
-
 		if (glfwWindowShouldClose(window)) return -1;
 		if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
 			return -1;
 		}
-		if (v[i] == t) {
-			/*batch[curr].color = RED;
-			batch[curr + 1].color = RED;
-			batch[curr + 2].color = RED;
-			batch[curr + 3].color = RED;*/
-			v_colors[i] = RED;
+		curr = i * 4;
+		
+		timer += glfwGetTime() - last_time;
+		last_time = glfwGetTime();
 
-			glClear(GL_COLOR_BUFFER_BIT);
-			//gl_draw_batch();
-			gl_draw_rectangles();
-			return i;
+		if (timer > wait_timer) {
+			timer = 0.0;
+			if (v[i] == t) {
+				set_batch_color(curr, RED);
+				glClear(GL_COLOR_BUFFER_BIT);
+				gl_draw_batch();
+				return i;
+			}
 		}
-
-		v_colors[i] = GREEN;
-		/*batch[curr].color = GREEN;
-		batch[curr + 1].color = GREEN;
-		batch[curr + 2].color = GREEN;
-		batch[curr + 3].color = GREEN;*/
-
-		glClear(GL_COLOR_BUFFER_BIT);
-		//gl_draw_batch();
-		gl_draw_rectangles();
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-		//timer += glfwGetTime() - last_time;
-		//last_time = glfwGetTime();
-		//	
-		//if (timer >= wait_timer) {
-
-		//	timer = 0.0;
-		//	//curr = i * 4;
-
-		//	if (v[i] == t) {
-		//		/*batch[curr].color = RED;
-		//		batch[curr + 1].color = RED;
-		//		batch[curr + 2].color = RED;
-		//		batch[curr + 3].color = RED;*/
-		//		v_colors[i] = RED;
-
-		//		glClear(GL_COLOR_BUFFER_BIT);
-		//		//gl_draw_batch();
-		//		gl_draw_rectangles();
-		//		return i;
-		//	}
-
-		//	v_colors[i] = GREEN;
-		//	/*batch[curr].color = GREEN;
-		//	batch[curr + 1].color = GREEN;
-		//	batch[curr + 2].color = GREEN;
-		//	batch[curr + 3].color = GREEN;*/
-
-		//	glClear(GL_COLOR_BUFFER_BIT);
-		//	//gl_draw_batch();
-		//	gl_draw_rectangles();
-		//	glfwSwapBuffers(window);
-		//	glfwPollEvents();
-		//}
-		//else {
-		//	i--;
-		//}
+		else {
+			i--;
+			set_batch_color(curr, GREEN);
+			glClear(GL_COLOR_BUFFER_BIT);
+			gl_draw_batch();
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 	}
 	return 1;
 }
@@ -697,60 +543,48 @@ void selection_sort(int s)
 	int min_i = 0;
 	int t = 0;
 
-	float wait_timer = 0.0001;
-	float timer = 0.0;
-	float last_time = glfwGetTime();
+	int curr = 0;
+	int curr_min = 0;
+	int next = 0;
+
+	//float wait_timer = 0.0001;
+	//float timer = 0.0;
+	//float last_time = glfwGetTime();
 
 	for (int i = 0; i < s - 1; i++) {
 		
 		min_i = i;
 		min = v[i];
+		curr = i * 4;
+		curr_min = min_i * 4;
 
 		for (int j = i + 1; j < s; j++) {
 			if (glfwWindowShouldClose(window)) return;
 			if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
 				return;
 			}
+			next = j * 4;
 
 			if (v[j] < min) {
-				v_colors[min_i] = YELLOW;
+				set_batch_color(curr_min, YELLOW);
 				min = v[j];
 				min_i = j;
-				v_colors[min_i] = BLUE;
+				curr_min = j * 4;
+				set_batch_color(next, BLUE);
 			}
 
-			/*timer += glfwGetTime() - last_time;
-			last_time = glfwGetTime();
-			if (timer >= wait_timer) {
-				timer = 0.0;
-				if (v[j] < min) {
-					v_colors[min_i] = YELLOW;
-					min = v[j];
-					min_i = j;
-					v_colors[min_i] = BLUE;
-				}
-			}
-			else {
-				j--;
-			}*/
-
-			//glClear(GL_COLOR_BUFFER_BIT);
-			//gl_draw_rectangles();
-			//glfwSwapBuffers(window);
-			//glfwPollEvents();
+			glClear(GL_COLOR_BUFFER_BIT);
+			gl_draw_batch();
+			glfwSwapBuffers(window);
+			glfwPollEvents();
 
 		}
-		
-		glClear(GL_COLOR_BUFFER_BIT);
-		gl_draw_rectangles();
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-
-		v_colors[min_i] = RED;
-		// swap
+		set_batch_color(curr_min, RED);	
 		t = v[min_i];
 		v[min_i] = v[i];
 		v[i] = t;
-		v_colors[i] = GREEN;
+		create_rectangle(min_i, curr_min, v.size(), RED);
+		create_rectangle(i, curr, v.size(), GREEN);
+		set_batch_color(curr, GREEN);
 	}
 }

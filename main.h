@@ -65,3 +65,6 @@ void selection_sort(int s);
 
 // HELPERS
 int get_random_number(int min, int max);
+void set_batch_color(int i, Color c);
+void batch_swap(int i1, int i2);
+void create_rectangle(int v1, int bi, int s, Color color);
