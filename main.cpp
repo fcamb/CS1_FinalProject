@@ -21,10 +21,10 @@ int main(void)
 	fill_vectors(300);
 	gl_gen_new_batch();
 	gl_fill_batch(v.size());
-	
+
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
-		
+
 		/*for (int i = 0; i < v.size(); i++) {
 			gl_draw_rectangle(v[i], v.size(), (float)i);
 		}*/
@@ -44,6 +44,9 @@ int main(void)
 			}
 			else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 				current_algo = SELECTION_SORT;
+			}
+			else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+				change_targets();
 			}
 		} 
 
@@ -91,6 +94,14 @@ int main(void)
 
 	glfwTerminate();
 	return 0;
+}
+void change_targets()
+{
+	std::cout << "Linear Search Target: ";
+	std::cin >> linear_target;
+
+	std::cout << "Binary Search Target: ";
+	std::cin >> bin_target;
 }
 int get_random_number(int min, int max)
 {

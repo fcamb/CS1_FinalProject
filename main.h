@@ -7,7 +7,7 @@
 
 float screen_w = 1920;
 float screen_h = 1080;
-
+int choice = -1;
 GLFWwindow* window = nullptr;
 
 GLuint rectangle_vao;
@@ -64,6 +64,9 @@ int linear_search(int s, int t);
 void selection_sort(int s);
 
 // HELPERS
+
+// no error checking
+void change_targets();
 int get_random_number(int min, int max);
 void set_batch_color(int i, Color c);
 void batch_swap(int i1, int i2);
