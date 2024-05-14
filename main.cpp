@@ -19,18 +19,12 @@ int main(void)
 		return 0;
 	}
 
-	//fill_vectors(300);
+	srand(time(nullptr));
+
 	fill_array_data_files();
-	//load_array_data_from_file("array_200.txt");
-	//gl_gen_new_batch();
-	//gl_fill_batch(v.size());
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		/*for (int i = 0; i < v.size(); i++) {
-			gl_draw_rectangle(v[i], v.size(), (float)i);
-		}*/
 		if (!array_loaded) {
 			std::cout << "Which array to load?\n";
 			std::cout << "Small, medium, large: (0, 1, 2): ";
@@ -120,7 +114,6 @@ int main(void)
 					break;
 				case NONE:
 					gl_draw_batch();
-					//gl_draw_rectangles();
 			}
 		}
 		
@@ -132,8 +125,12 @@ int main(void)
 	glDeleteBuffers(1, &rectangle_vbo);
 	glDeleteBuffers(1, &rectangle_ebo);
 	glDeleteProgram(basic_shader);
+	glDeleteVertexArrays(1, &batch_vao);
+	glDeleteBuffers(1, &batch_vbo);
+	glDeleteBuffers(1, &batch_ebo);
 
 	glfwTerminate();
+
 	return 0;
 }
 void gl_display_menu()
@@ -148,7 +145,7 @@ void gl_display_menu()
 	std::cout << "T to change target numbers for searching.\n";
 	std::cout << "A to switch to different array.\n";
 	std::cout << "- to cancel an algorithm\n";
-	std::cout << "--Focus must be in window, not terminal--\n";
+	std::cout << "--Input Focus must be in window, not terminal--\n";
 }
 void load_array_data_from_file(const char* path)
 {
@@ -163,9 +160,7 @@ void load_array_data_from_file(const char* path)
 	}
 
 	int n;
-	char c;
 	std::string line{};
-
 	while (std::getline(in, line)) {
 		std::stringstream ss(line);
 		while (ss >> n) {
@@ -180,7 +175,7 @@ void fill_array_data_files()
 {
 	std::ofstream small;
 	small.open("array_200.txt");
-	if (!small) {
+	if (small.fail()) {
 		std::cout << "Failed to open for writing: " << "array_200.txt\n";
 	}
 
@@ -199,7 +194,7 @@ void fill_array_data_files()
 
 	std::ofstream medium;
 	medium.open("array_300.txt");
-	if (!medium) {
+	if (medium.fail()) {
 		std::cout << "Failed to open for writing: " "array_300.txt\n";
 	}
 
@@ -217,7 +212,7 @@ void fill_array_data_files()
 
 	std::ofstream large;
 	large.open("array_400.txt");
-	if (!large) {
+	if (large.fail()) {
 		std::cout << "Failed to open for writing: " << "array_400.txt\n";
 	}
 	
@@ -237,6 +232,9 @@ void fill_array_data_files()
 }
 void change_targets()
 {
+	std::cin.clear();
+	std::cin.ignore(256, '\n');
+	
 	std::cout << "Linear Search Target: ";
 	std::cin >> linear_target;
 
@@ -247,15 +245,7 @@ int get_random_number(int min, int max)
 {
 	return ((rand() % (max - min)) + min);
 }
-void fill_vectors(int s)
-{
-	for (int i = 0; i < s; i++) {
-		v.push_back(get_random_number(10, 400));
-		v_colors.push_back(YELLOW);
-	}
-	v2 = v;
-	v_colors2 = v_colors;
-}
+
 void gl_gen_new_batch()
 {
 	int size = v.size() * 6;
@@ -302,6 +292,7 @@ void gl_gen_new_batch()
 		indices[i + 4] = 3 + offset;
 		indices[i + 5] = 0 + offset;
 	}
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, batch_ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * size, indices, GL_STATIC_DRAW);
 	delete[] indices;
@@ -312,15 +303,14 @@ void gl_gen_new_batch()
 }
 void gl_fill_batch(int s)
 {
-	//std::cout << "FILLING BATCH:\n";
-	float rect_width = (screen_w / s) - 1.0;
-	float rect_height = 0.0;
-	float start_y = 0.0;
-	float rx = 0.0;
-	float ry = 0.0;
-	float rh = 0.0;
-	float rw = 0.0;
-	float x = 0.0;
+	float rect_width = (screen_w / s) - 1.0f;
+	float rect_height = 0.0f;
+	float start_y = 0.0f;
+	float rx = 0.0f;
+	float ry = 0.0f;
+	float rh = 0.0f;
+	float rw = 0.0f;
+	float x = 0.0f;
 	
 	batch_triangle_count = 0;
 	
@@ -339,7 +329,7 @@ void gl_fill_batch(int s)
 		batch.push_back({ {rw, ry}, YELLOW });
 
 		batch_triangle_count += 6;
-		x += (rect_width + 1.0);
+		x += (rect_width + 1.0f);
 	}
 	
 	glBindBuffer(GL_ARRAY_BUFFER, batch_vbo);
@@ -348,81 +338,9 @@ void gl_fill_batch(int s)
 
 void gl_reset_batch()
 {
-	//std::cout << "RESETTING BATCH:\n";
 	v = v2;
-	v_colors = v_colors2;
-	
 	batch.clear();
 	gl_fill_batch(v.size());
-}
-void resize_batch_columns(int s)
-{
-	//batch.clear();
-	float rect_width = (screen_w / s) - 1.0;
-	float rect_height = 0.0;
-	float start_y = 0.0;
-	float rx = 0.0;
-	float ry = 0.0;
-	float rh = 0.0;
-	float rw = 0.0;
-	float x = 0.0;
-
-	batch_triangle_count = 0;
-
-	for (int i = 0; i < s; i++) {
-		rect_height = (float)v[i];
-		start_y = screen_h - rect_height;
-
-		rx = (2.f * x / screen_w - 1.f);
-		ry = -(2.f * start_y / screen_h - 1.f);
-		rw = (2.f * (x + rect_width) / screen_w - 1.f);
-		rh = -(2.f * (start_y + rect_height) / screen_h - 1.f);
-
-		Color c = batch[i].color;
-		batch[i] = { {rx,ry}, c };
-		batch[i + 1] = { {rx, rh}, c };
-		batch[i + 2] = { {rw, rh}, c };
-		batch[i + 3] = { {rw, ry}, c };
-		/*batch.push_back({ {rx, ry}, YELLOW });
-		batch.push_back({ {rx, rh}, YELLOW });
-		batch.push_back({ {rw, rh}, YELLOW });
-		batch.push_back({ {rw, ry}, YELLOW });*/
-
-		batch_triangle_count += 6;
-		x += (rect_width + 1.0);
-	}
-	/*for (int i = 0; i < batch.size(); i++) {
-		batch[i].position.x
-	}*/
-	glBindBuffer(GL_ARRAY_BUFFER, batch_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Vertex) * batch_triangle_count, &batch[0]);
-}
-void gl_draw_rectangle(int num, int s, float x, Color color)
-{
-	float rect_width = (screen_w / s) - 1.0;
-	float rect_height = (float)num * 2.0;
-	float start_y = screen_h - rect_height;
-	x *= rect_width + 1.0;
-	// top left first
-
-	float rx = (2.f * x / screen_w - 1.f);
-	float ry = -(2.f * start_y / screen_h - 1.f);
-	float rw = (2.f * (x + rect_width) / screen_w - 1.f);
-	float rh = -(2.f * (start_y + rect_height) / screen_h - 1.f);
-
-	std::vector<Vertex> R = {
-		{{rx, ry}, color},
-		{{rx, rh}, color},
-		{{rw, rh}, color},
-		{{rw, ry}, color},
-	};
-
-	glBindBuffer(GL_ARRAY_BUFFER, rectangle_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, R.size() * sizeof(Vertex), &R[0]);
-
-	glUseProgram(basic_shader);
-	glBindVertexArray(rectangle_vao);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 
 void gl_draw_batch()
@@ -434,15 +352,6 @@ void gl_draw_batch()
 	glBindVertexArray(batch_vao);
 	glDrawElements(GL_TRIANGLES, batch_triangle_count, GL_UNSIGNED_INT, nullptr);
 }
-
-void gl_draw_rectangles()
-{
-	int n = v.size();
-	for (int i = 0; i < n; i++) {
-		gl_draw_rectangle(v[i], n, (float)i, v_colors[i]);
-	}
-}
-
 bool glfw_setup()
 {
 	if (!glfwInit()) return false;
@@ -459,13 +368,13 @@ bool glfw_setup()
 	
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(0);
-	// callbacks
+	// any callbacks
+	glfwSetFramebufferSizeCallback(window, frame_buffersize_callback);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "GLFW: Failed to load opengl functions - GLAD.\n";
 		return false;
 	}
-	glfwSetFramebufferSizeCallback(window, frame_buffersize_callback);
 
 	std::cout << "GLFW: Initialized.\n";
 	
@@ -489,40 +398,13 @@ void gl_setup()
 	basic_shader = gl_load_shaders("shaders/basic_v.glsl", "shaders/basic_f.glsl");
 }
 
-void gl_gen_basic_vao()
-{
-	glGenVertexArrays(1, &rectangle_vao);
-	glGenBuffers(1, &rectangle_vbo);
-	glGenBuffers(1, &rectangle_ebo);
-	glBindVertexArray(rectangle_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, rectangle_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rectangle_ebo);
-	// should this be static draw?
-	int indices[] = { 0, 1, 2, 2, 3, 0 };
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	std::cout << "GL: Rectangle VAO built.\n";
-}
-
 GLuint gl_load_shaders(const char* vpath, const char* fpath)
 {
 	std::ifstream vertex;
 	std::ifstream fragment;
 
 	vertex.open(vpath);
-	if (vertex.fail()) {
+	if (!vpath) {
 		std::cout << "GL: Failed to open vertex shader file.\n";
 		return -1;
 	}
@@ -546,7 +428,7 @@ GLuint gl_load_shaders(const char* vpath, const char* fpath)
 	vertex.close();
 
 	fragment.open(fpath);
-	if (fragment.fail()) {
+	if (!fpath) {
 		std::cout << "GL: Failed to open fragment shader file.\n";
 		return -1;
 	}
@@ -601,8 +483,8 @@ int binary_search(int s, int t)
 	int m = (l + r) / 2;
 	int curr_m = m * 4;
 
-	float wait_timer = 1.0;
-	float timer = 0.0;
+	float wait_timer = 1.0f;
+	float timer = 0.0f;
 	float last_time = glfwGetTime();
 	
 	while (l <= r) {
@@ -667,10 +549,10 @@ void set_batch_color(int i, Color c)
 
 void create_rectangle(int vi, int bi, int s, Color color)
 {
-	float rect_width = (screen_w / s) - 1.0;
-	float rect_height = (float)v[vi] * 2.0;
+	float rect_width = (screen_w / s) - 1.0f;
+	float rect_height = (float)v[vi] * 2.0f;
 	float start_y = screen_h - rect_height;
-	float x = (vi * (rect_width + 1.0));
+	float x = (vi * (rect_width + 1.0f));
 
 	float rx = (2.f * x / screen_w - 1.f);
 	float ry = -(2.f * start_y / screen_h - 1.f);
@@ -688,7 +570,6 @@ void bubble_sort(int s)
 	int curr = 0;
 	int next = 4;
 	int end = 0;
-	//bool swapped = false;
 
 	for (int i = s - 1; i > 0; i--) {
 		end = i * 4;
@@ -701,15 +582,16 @@ void bubble_sort(int s)
 		
 			curr = j * 4;
 			next = (j + 1) * 4;
+			
 			set_batch_color(curr, GREEN);
 			set_batch_color(next, BLUE);
+
 			if (v[j] > v[j + 1]) {
 				// swap
 				t = v[j];
 				v[j] = v[j + 1];
 				v[j + 1] = t;
 				set_batch_color(end, BLACK);
-				//batch_swap(curr, next);
 				create_rectangle(j, curr, v.size(), GREEN);
 				create_rectangle(j + 1, next, v.size(), BLUE);
 				glClear(GL_COLOR_BUFFER_BIT);
@@ -726,8 +608,8 @@ int linear_search(int s, int t)
 {
 	int curr = 0;
 	
-	float wait_timer = 0.001;
-	float timer = 0.0;
+	float wait_timer = 0.001f;
+	float timer = 0.0f;
 	float last_time = glfwGetTime();
 	
 	for (int i = 0; i < s; i++) {

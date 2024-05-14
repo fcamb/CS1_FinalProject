@@ -47,25 +47,23 @@ bool binary_search_done = false;
 // SETUP
 bool glfw_setup();
 void gl_setup();
-void gl_gen_basic_vao();
+GLuint gl_load_shaders(const char* vpath, const char* fpath);
+
 void gl_gen_new_batch();
 void gl_fill_batch(int s);
 void gl_reset_batch();
-void fill_vectors(int s);
-GLuint gl_load_shaders(const char* vpath, const char* fpath);
 
 // DRAWING 
 void gl_draw_rectangle(int num, int s, float x, Color color);
 void gl_draw_batch();
-void gl_draw_rectangles();
 void gl_display_menu();
+
 // DATA LOADING
 void fill_array_data_files();
 void load_array_data_from_file(const char* path);
 
 // WINDOW
 void frame_buffersize_callback(GLFWwindow* window, int w, int h);
-void resize_batch_columns(int s);
 
 // ALGORITHMS
 // BINARY SEARCH, LINEAR SEARCH, BUBBLE SORT, SELECTION SORT
@@ -76,9 +74,8 @@ void selection_sort(int s);
 
 // HELPERS
 
-// no error checking
+// no error checking in this function
 void change_targets();
 int get_random_number(int min, int max);
 void set_batch_color(int i, Color c);
-void batch_swap(int i1, int i2);
 void create_rectangle(int v1, int bi, int s, Color color);
